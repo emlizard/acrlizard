@@ -21,9 +21,10 @@
     .warning { color: #c0392b; font-weight: bold; margin-top: 1rem; }
     .formulas { margin-top: 2rem; padding: 1rem; background: #fff; border: 1px solid #ccc; border-radius: 4px; }
     .formulas h2 { margin-top: 0; }
-    img.diagram { max-width: 100%; height: auto; margin-bottom: 1rem; }
+    img.diagram { display: block; margin: 0 auto 1rem auto; max-width: 100%; height: auto; }
     .chart-container { margin-top: 2rem; }
     canvas { width: 100% !important; height: 400px !important; }
+  
   </style>
 </head>
 <body>
@@ -43,7 +44,7 @@
     </div>
     <div class="field">
       <label for="r0">Wire Radius r₀ (mm)</label>
-      <input type="number" id="r0" value="1" />
+      <input type="number" id="r0" value="0.5" />
     </div>
     <div class="field">
       <label for="N">Turns N</label>
@@ -51,11 +52,11 @@
     </div>
     <div class="field">
       <label for="p">Pitch Array p (comma-separated, mm)</label>
-      <input type="text" id="p" value="5" />
+      <input type="text" id="p" value="1.2" />
     </div>
     <div class="field">
       <label for="rout">Outer Radius rₒᵤₜ (mm)</label>
-      <input type="number" id="rout" value="20" />
+      <input type="number" id="rout" value="30" />
     </div>
     <div class="field">
       <label for="shape">Shape</label>
