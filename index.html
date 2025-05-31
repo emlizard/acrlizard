@@ -24,14 +24,13 @@
     img.diagram { display: block; margin: 0 auto 1rem auto; max-width: 100%; height: auto; }
     .chart-container { margin-top: 2rem; }
     canvas { width: 100% !important; height: 400px !important; }
-  
   </style>
 </head>
 <body>
   <header><h1>Coil Resistance Calculator</h1></header>
   <div class="container">
-    <!-- Insert Spiral Diagram -->
-    <img src="https://emlizard.github.io/main-page/images/diagram_spiral.jpg" alt="Spiral Diagram" class="diagram" />
+    <!-- Centered Spiral Diagram -->
+    <img src="httpps://emlizard.github.io/main-page/images/diagram_spiral.jpg" alt="Spiral Diagram" class="diagram" />
 
     <!-- Input Fields -->
     <div class="field">
@@ -56,7 +55,7 @@
     </div>
     <div class="field">
       <label for="rout">Outer Radius rₒᵤₜ (mm)</label>
-      <input type="number" id="rout" value="30" />
+      <input type="number" id="rout" value="20" />
     </div>
     <div class="field">
       <label for="shape">Shape</label>
@@ -70,17 +69,14 @@
     <!-- Result Area -->
     <div id="result" class="result"></div>
 
-    <!-- DC Resistance Calculation Explanation -->
-    <p>R<sub>DC</sub> = l / (σ · A), where A = π·r₀²</p>
-
     <!-- Plot Controls -->
     <div class="field">
       <label for="plotType">Plot Type</label>
       <select id="plotType">
-        <option value="pitch_R">Resistance vs Pitch (fixed frequency)</option>
-        <option value="pitch_Gp">Gp vs Pitch (fixed frequency)</option>
-        <option value="freq_R">Resistance vs Frequency (fixed pitch)</option>
-        <option value="freq_Gp">Gp vs Frequency (fixed pitch)</option>
+        <option value="pitch_R">Resistance(Ω) vs Pitch(mm)</option>
+        <option value="pitch_Gp">Gp vs Pitch(mm)</option>
+        <option value="freq_R">Resistance(Ω) vs Frequency(MHx)</option>
+        <option value="freq_Gp">Gp vs Frequency(MHz)</option>
       </select>
     </div>
     <div class="field" id="sweepRange">
@@ -99,50 +95,66 @@
     <!-- Used Formulas (MathJax) -->
     <div class="formulas">
       <h2>Formulas Used</h2>
+
+      <h3>Skin Depth (δ)</h3>
       \[
       \delta = \frac{1}{\sqrt{\pi f \,\mu_0\, \sigma}}
       \]
+
+      <h3>Skin Resistance (R<sub>skin</sub>, Ω/m)</h3>
       \[
       R_{\mathrm{skin}} = \begin{cases}
         \displaystyle
-        \frac{\tfrac14 + \frac{r_0}{2\delta} + \frac{3\delta}{32 r_0}}{\pi \,r_0^2 \,\sigma}, & r_0>\delta, \\[1em]
+        \frac{\tfrac14 + \frac{r_0}{2\delta} + \frac{3\delta}{32 r_0}}{\pi \; r_0^2 \; \sigma}, & r_0 > \delta, \\[1em]
         \displaystyle
-        \frac{1 + \bigl(\tfrac{r_0}{\delta}\bigr)^4/48}{\pi \,r_0^2 \,\sigma}, & r_0\le\delta,
+        \frac{1 + \bigl(\tfrac{r_0}{\delta}\bigr)^4/48}{\pi \; r_0^2 \; \sigma}, & r_0 \le \delta,
       \end{cases}
       \]
+
+      <h3>Coil Length (l)</h3>
       \[
-      l = L_{\mathrm{coil}} = \begin{cases}
-        2\pi\,\displaystyle\sum_{k=1}^N \Bigl(r_{\mathrm{out}} - \sum_{i=1}^{k-1} p_i\Bigr), & \text{Spiral} \\[1em]
+      l = \begin{cases}
+        2\pi\,\displaystyle\sum_{k=1}^N \Bigl(r_{\mathrm{out}} - \sum_{i=1}^{k-1} p_i\Bigr), & \text{Spiral}\\[1em]
         2\pi\,r_{\mathrm{out}}\,N, & \text{Helical}
       \end{cases}
       \]
+
+      <h3>DC Resistance (R<sub>DC</sub>)</h3>
       \[
-      R_{DC} = \frac{l}{\sigma \,\pi\, r_0^2}
+      R_{DC} = \frac{l}{\sigma \; \pi \; r_0^2}
+      \]
+
+      <h3>Geometric Constraints</h3>
+      \[
+      (N-1) \times p_{\mathrm{max}} \le r_{\mathrm{out}} \quad \text{(reduce turns or pitch if not met)}
       \]
       \[
-      (N-1) \times p_{\mathrm{max}} \le r_{\mathrm{out}} \quad \text{(Condition; reduce turns or pitch if not met)}
+      p_i \ge 2 \; r_0 \quad \text{for all i (reduce pitch if not met)}
       \]
-      \[
-      p_i \ge 2 r_0 \quad \text{for all i (Condition; reduce pitch if not met)}
-      \]
+
+      <h3>Proximity Factor (G<sub>p</sub>)</h3>
       \[
       G_p = \begin{cases}
         \displaystyle
-        \frac{8\,\pi^2\,\delta^2\,x^3\,(x-1)\,\sum_{m=1}^N H_m^2}{N\bigl((2x+1)^2+2\bigr)}, & r_0>\delta, \\[1em]
-        0, & r_0\le\delta
-      \end{cases},\quad x = \frac{2 r_0}{\delta}
+        \frac{8 \pi^2 \; \delta^2 \; x^3 \; (x-1) \; \sum_{m=1}^N H_m^2}{N \bigl((2x+1)^2+2\bigr)}, & r_0 > \delta, \\[1em]
+        0, & r_0 \le \delta
+      \end{cases},\quad x = \frac{2 \; r_0}{\delta}
       \]
+
+      <h3>Magnetic Field Terms (H<sub>m</sub>)</h3>
       \[
       H_m = \frac{H_{\rm asy}(m) + H_{\rm sym}(m)}{2\pi}
       \]
       \[
       H_{\rm asy}(m) = \sum_{i=1}^N \frac{p_{m+i-1}}{\bigl(p_{m+i-1}\bigr)^2 + r_0^2}, \quad
-      H_{\rm sym}(m) = \sum_{q=1}^N \frac{2\,r_0}{p_q^2\,q^2 - r_0^2}
+      H_{\rm sym}(m) = \sum_{q=1}^N \frac{2 \; r_0}{p_q^2 \; q^2 - r_0^2}
       \]
+
+      <h3>Total Resistances</h3>
       \[
-      R_{\mathrm{skin,tot}} = R_{\mathrm{skin}} \times l,\quad
-      R_{\mathrm{prox,tot}} = G_p \times R_{\mathrm{skin}},\quad
-      R_{\mathrm{total}} = (1+G_p)\,R_{\mathrm{skin}} \times l
+      R_{\mathrm{skin,tot}} = R_{\mathrm{skin}} \times l, \quad
+      R_{\mathrm{prox,tot}} = G_p \times R_{\mathrm{skin}}, \quad
+      R_{\mathrm{total}} = (1+G_p) \; R_{\mathrm{skin}} \times l
       \]
     </div>
   </div>
@@ -255,10 +267,10 @@
         ${warningMsg}
         <p><strong>Skin Depth δ:</strong> ${delta_um.toFixed(3)} µm</p>
         <p><strong>Coil Length ℓ:</strong> ${l.toFixed(6)} m</p>
-        <p><strong>DC Resistance R<sub>DC</sub>:</strong> ${Rdc.toFixed(6)} Ω</p>
-        <p><strong>Skin Resistance Rₛ,total:</strong> ${Rskin_tot.toFixed(6)} Ω</p>
-        <p><strong>Proximity Resistance Rₚ,total:</strong> ${Rprox_tot.toFixed(6)} Ω</p>
-        <p><strong>Total AC Resistance Rₜₒₜₐₗ:</strong> ${Rtotal.toFixed(6)} Ω</p>
+        <p><strong>DC Resistance R<sub>DC</sub>:</strong> ${Rdc.toFixed(3)} Ω</p>
+        <p><strong>Skin Resistance Rₛ,total:</strong> ${Rskin_tot.toFixed(3)} Ω</p>
+        <p><strong>Proximity Resistance Rₚ,total:</strong> ${Rprox_tot.toFixed(3)} Ω</p>
+        <p><strong>Total AC Resistance Rₜₒₜₐₗ:</strong> ${Rtotal.toFixed(3)} Ω</p>
       `;
     }
 
