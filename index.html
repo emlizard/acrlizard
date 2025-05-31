@@ -31,6 +31,7 @@
   <div class="container">
     <!-- Insert Spiral Diagram -->
     <img src="https://emlizard.github.io/main-page/images/diagram_spiral.jpg" alt="Spiral Diagram" class="diagram" />
+
     <!-- Input Fields -->
     <div class="field">
       <label for="f">Frequency f (MHz)</label>
@@ -64,6 +65,7 @@
       </select>
     </div>
     <button onclick="calculateResistance()">Calculate Resistance</button>
+
     <!-- Result Area -->
     <div id="result" class="result"></div>
 
@@ -96,51 +98,51 @@
     <!-- Used Formulas (MathJax) -->
     <div class="formulas">
       <h2>Formulas Used</h2>
-      \\[
-      \\delta = \\frac{1}{\\sqrt{\\pi f \\mu_0 \\sigma}}
-      \\]
-      \\[
-      R_{\\mathrm{skin}} = \\begin{cases}
-        \\displaystyle
-        \\frac{\\tfrac14 + \\frac{r_0}{2\\delta} + \\frac{3\\delta}{32 r_0}}{\\pi r_0^2 \\sigma}, & r_0>\\delta, \\\\
-        \\displaystyle
-        \\frac{1 + \\bigl(\\tfrac{r_0}{\\delta}\\bigr)^4/48}{\\pi r_0^2 \\sigma}, & r_0\\le\\delta,
-      \\end{cases}
-      \\]
-      \\[
-      l = L_{\\mathrm{coil}} = \\begin{cases}
-        2\\pi\\displaystyle\\sum_{k=1}^N \\Bigl(r_{\\mathrm{out}} - \\sum_{i=1}^{k-1} p_i\\Bigr), & \\text{Spiral}\\\\
-        2\\pi\\,r_{\\mathrm{out}}\\,N, & \\text{Helical}
-      \\end{cases}
-      \\]
-      \\[
-      R_{DC} = \\frac{l}{\\sigma \\pi r_0^2}
-      \\]
-      \\[
-      (N-1) \\times p_{\\mathrm{max}} \\le r_{\\mathrm{out}} \\quad \\text{(Condition; reduce turns or pitch if not met)}
-      \\]
-      \\[
-      p_i \\ge 2r_0 \\quad \\text{for all i (Condition; reduce pitch if not met)}
-      \\]
-      \\[
-      G_p = \\begin{cases}
-        \\displaystyle
-        \\frac{8\\pi^2 \\delta^2 x^3 (x-1) \\sum_{m=1}^N H_m^2}{N\\bigl((2x+1)^2+2\\bigr)}, & r_0>\\delta, \\\\
-        0, & r_0\\le\\delta
-      \\end{cases},\\quad x = \\frac{2r_0}{\\delta}
-      \\]
-      \\[
-      H_m = \\frac{H_{\\rm asy}(m) + H_{\\rm sym}(m)}{2\\pi}
-      \\]
-      \\[
-      H_{\\rm asy}(m) = \\sum_{i=1}^N \\frac{p_{m+i-1}}{\\bigl(p_{m+i-1}\\bigr)^2 + r_0^2},\\quad
-      H_{\\rm sym}(m) = \\sum_{q=1}^N \\frac{2r_0}{p_q^2 q^2 - r_0^2}
-      \\]
-      \\[
-      R_{\\mathrm{skin,tot}} = R_{\\mathrm{skin}} \\times l,\\quad
-      R_{\\mathrm{prox,tot}} = G_p \\times R_{\\mathrm{skin}},\\quad
-      R_{\\mathrm{total}} = (1+G_p)\\,R_{\\mathrm{skin}} \\times l
-      \\]
+      \[
+      \delta = \frac{1}{\sqrt{\pi f \,\mu_0\, \sigma}}
+      \]
+      \[
+      R_{\mathrm{skin}} = \begin{cases}
+        \displaystyle
+        \frac{\tfrac14 + \frac{r_0}{2\delta} + \frac{3\delta}{32 r_0}}{\pi \,r_0^2 \,\sigma}, & r_0>\delta, \\[1em]
+        \displaystyle
+        \frac{1 + \bigl(\tfrac{r_0}{\delta}\bigr)^4/48}{\pi \,r_0^2 \,\sigma}, & r_0\le\delta,
+      \end{cases}
+      \]
+      \[
+      l = L_{\mathrm{coil}} = \begin{cases}
+        2\pi\,\displaystyle\sum_{k=1}^N \Bigl(r_{\mathrm{out}} - \sum_{i=1}^{k-1} p_i\Bigr), & \text{Spiral} \\[1em]
+        2\pi\,r_{\mathrm{out}}\,N, & \text{Helical}
+      \end{cases}
+      \]
+      \[
+      R_{DC} = \frac{l}{\sigma \,\pi\, r_0^2}
+      \]
+      \[
+      (N-1) \times p_{\mathrm{max}} \le r_{\mathrm{out}} \quad \text{(Condition; reduce turns or pitch if not met)}
+      \]
+      \[
+      p_i \ge 2 r_0 \quad \text{for all i (Condition; reduce pitch if not met)}
+      \]
+      \[
+      G_p = \begin{cases}
+        \displaystyle
+        \frac{8\,\pi^2\,\delta^2\,x^3\,(x-1)\,\sum_{m=1}^N H_m^2}{N\bigl((2x+1)^2+2\bigr)}, & r_0>\delta, \\[1em]
+        0, & r_0\le\delta
+      \end{cases},\quad x = \frac{2 r_0}{\delta}
+      \]
+      \[
+      H_m = \frac{H_{\rm asy}(m) + H_{\rm sym}(m)}{2\pi}
+      \]
+      \[
+      H_{\rm asy}(m) = \sum_{i=1}^N \frac{p_{m+i-1}}{\bigl(p_{m+i-1}\bigr)^2 + r_0^2}, \quad
+      H_{\rm sym}(m) = \sum_{q=1}^N \frac{2\,r_0}{p_q^2\,q^2 - r_0^2}
+      \]
+      \[
+      R_{\mathrm{skin,tot}} = R_{\mathrm{skin}} \times l,\quad
+      R_{\mathrm{prox,tot}} = G_p \times R_{\mathrm{skin}},\quad
+      R_{\mathrm{total}} = (1+G_p)\,R_{\mathrm{skin}} \times l
+      \]
     </div>
   </div>
 
@@ -187,7 +189,7 @@
       if (radialSpan > rout) {
         warningMsg += '<p class="warning">Warning: (N-1) × max pitch exceeds outer radius. Reduce turns or pitch.</p>';
       }
-      // Check each pitch >= 2*r0
+      // Check each pitch ≥ 2·r₀
       for (const pitch_mm of p_mm) {
         if (pitch_mm < 2 * r0_mm) {
           warningMsg += '<p class="warning">Warning: Pitch must be ≥ 2×wire radius. Reduce pitch.</p>';
@@ -199,7 +201,7 @@
       const delta = 1 / Math.sqrt(Math.PI * f * mu0 * sigma);
       const delta_um = delta * 1e6;
 
-      // 2) H_m calculation
+      // 2) Hₘ calculation
       const Hm = [];
       for (let m = 1; m <= N; m++) {
         const Hasy = f_H_asy(r0, p, m, N);
@@ -208,7 +210,7 @@
       }
       const sumHm2 = Hm.reduce((s, h) => s + h * h, 0);
 
-      // 3) Proximity factor Gp
+      // 3) Proximity factor Gₚ
       const x = (2 * r0) / delta;
       let Gp = 0;
       if (r0 > delta) {
@@ -216,7 +218,7 @@
              (N * ((2 * x + 1) * (2 * x + 1) + 2));
       }
 
-      // 4) Skin resistance R_skin (Ω/m)
+      // 4) Skin resistance Rₛ (Ω/m)
       let Rskin_m;
       if (r0 > delta) {
         Rskin_m = (0.25 + r0 / (2 * delta) + (3 * delta) / (32 * r0)) / (Math.PI * r0 * r0 * sigma);
@@ -224,7 +226,7 @@
         Rskin_m = (1 + Math.pow(r0 / delta, 4) / 48) / (Math.PI * r0 * r0 * sigma);
       }
 
-      // 5) Coil length l (m)
+      // 5) Coil length ℓ (m)
       let l = 0;
       if (shape === 'spiral') {
         let acc = 0;
