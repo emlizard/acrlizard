@@ -253,7 +253,7 @@
       resultDiv.innerHTML = `
         ${warningMsg}
         <p><strong>Skin Depth δ:</strong> ${delta_um.toFixed(3)} µm</p>
-        <p><strong>Coil Length l:</strong> ${l.toFixed(6)} m</p>
+        <p><strong>Coil Length ℓ:</strong> ${l.toFixed(6)} m</p>
         <p><strong>DC Resistance R<sub>DC</sub>:</strong> ${Rdc.toFixed(6)} Ω</p>
         <p><strong>Skin Resistance Rₛ,total:</strong> ${Rskin_tot.toFixed(6)} Ω</p>
         <p><strong>Proximity Resistance Rₚ,total:</strong> ${Rprox_tot.toFixed(6)} Ω</p>
@@ -277,7 +277,7 @@
       const p_mm = document.getElementById('p').value.split(',').map(x => parseFloat(x.trim()));
       const p_orig = p_mm.map(x => x * 1e-3);
       const rout_mm = parseFloat(document.getElementById('rout').value);
-      const rout = rout_mm * 1e-3;
+      const rout = rout_mm * 1e-3; 
       const shape = document.getElementById('shape').value;
 
       for (let i = 0; i <= steps; i++) {
@@ -301,29 +301,17 @@
         data.push(yVal);
       }
 
-      // Create or update chart
-      const ctx = document.getElementById('myChart').getContext('2d');
-      if (window.myChart) window.myChart.destroy();
-      window.myChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: (type.includes('pitch') ? 'Pitch (mm)' : 'Frequency (MHz)') + ' vs ' +
-                   (type.includes('R') ? 'Resistance (Ω)' : 'Gp'),
-            data: data,
-            borderColor: '#1abc9c',
-            backgroundColor: 'rgba(26, 188, 156, 0.2)',
-            fill: true
-          }]
-        },
-        options: {
-          scales: {
-            x: { display: true, title: { display: true, text: type.includes('pitch') ? 'Pitch (mm)' : 'Frequency (MHz)' } },
-            y: { display: true, title: { display: true, text: type.includes('R') ? 'Resistance (Ω)' : 'Gp' } }
-          }
-        }
-      });
+      // Update existing chart data
+      if (window.myChart) {
+        window.myChart.data.labels = labels;
+        window.myChart.data.datasets[0].data = data;
+        window.myChart.data.datasets[0].label = 
+          (type.includes('pitch') ? 'Pitch (mm)' : 'Frequency (MHz)') + ' vs ' +
+          (type.includes('R') ? 'Resistance (Ω)' : 'Gp');
+        window.myChart.options.scales.x.title.text = (type.includes('pitch') ? 'Pitch (mm)' : 'Frequency (MHz)');
+        window.myChart.options.scales.y.title.text = (type.includes('R') ? 'Resistance (Ω)' : 'Gp');
+        window.myChart.update();
+      }
     }
 
     function computeRGp(p_array, sigma, r0, N, rout, shape, f_override) {
@@ -333,7 +321,7 @@
       // Skin depth
       const delta = 1 / Math.sqrt(Math.PI * f * mu0 * sigma);
 
-      // Hm
+      // Hₘ
       const Hm = [];
       for (let m = 1; m <= N; m++) {
         const Hasy = f_H_asy(r0, p_array, m, N);
@@ -342,7 +330,7 @@
       }
       const sumHm2 = Hm.reduce((s, h) => s + h * h, 0);
 
-      // Proximity factor Gp
+      // Proximity factor Gₚ
       const x = (2 * r0) / delta;
       let Gp = 0;
       if (r0 > delta) {
@@ -377,9 +365,28 @@
       return { R: Rtot, Gp: Gp };
     }
 
-    // Initialize an empty chart on load
+    // Initialize an empty chart on load with dummy data
     window.onload = function() {
-      plotGraph();
+      const ctx = document.getElementById('myChart').getContext('2d');
+      window.myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: [''],                 // single dummy label
+          datasets: [{
+            label: '',                  // no label initially
+            data: [0],                  // single zero value
+            borderColor: '#1abc9c',
+            backgroundColor: 'rgba(26, 188, 156, 0.2)',
+            fill: true
+          }]
+        },
+        options: {
+          scales: {
+            x: { display: true, title: { display: true, text: '' } },
+            y: { display: true, title: { display: true, text: '' } }
+          }
+        }
+      });
     };
   </script>
 </body>
