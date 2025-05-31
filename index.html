@@ -30,7 +30,7 @@
   <header><h1>Coil Resistance Calculator</h1></header>
   <div class="container">
     <!-- Centered Spiral Diagram -->
-    <img src="httpps://emlizard.github.io/main-page/images/diagram_spiral.jpg" alt="Spiral Diagram" class="diagram" />
+    <img src="https://emlizard.github.io/main-page/images/diagram_spiral.jpg" alt="Spiral Diagram" class="diagram" />
 
     <!-- Input Fields -->
     <div class="field">
@@ -73,10 +73,10 @@
     <div class="field">
       <label for="plotType">Plot Type</label>
       <select id="plotType">
-        <option value="pitch_R">Resistance(Ω) vs Pitch(mm)</option>
-        <option value="pitch_Gp">Gp vs Pitch(mm)</option>
-        <option value="freq_R">Resistance(Ω) vs Frequency(MHx)</option>
-        <option value="freq_Gp">Gp vs Frequency(MHz)</option>
+        <option value="pitch_R">Resistance (Ω) vs Pitch (mm)</option>
+        <option value="pitch_Gp">Gp vs Pitch (mm)</option>
+        <option value="freq_R">Resistance (Ω) vs Frequency (MHz)</option>
+        <option value="freq_Gp">Gp vs Frequency (MHz)</option>
       </select>
     </div>
     <div class="field" id="sweepRange">
@@ -195,18 +195,19 @@
       const shape = document.getElementById('shape').value;
       const mu0 = 4 * Math.PI * 1e-7;
 
-      // Validation
-      const maxPitch_mm = Math.max(...p_mm);
-      const radialSpan = (N - 1) * (maxPitch_mm * 1e-3);
+      // Validation (only for spiral)
       let warningMsg = '';
-      if (radialSpan > rout) {
-        warningMsg += '<p class="warning">Warning: (N-1) × max pitch exceeds outer radius. Reduce turns or pitch.</p>';
-      }
-      // Check each pitch ≥ 2·r₀
-      for (const pitch_mm of p_mm) {
-        if (pitch_mm < 2 * r0_mm) {
-          warningMsg += '<p class="warning">Warning: Pitch must be ≥ 2×wire radius. Reduce pitch.</p>';
-          break;
+      if (shape === 'spiral') {
+        const maxPitch_mm = Math.max(...p_mm);
+        const radialSpan = (N - 1) * (maxPitch_mm * 1e-3);
+        if (radialSpan > rout) {
+          warningMsg += '<p class="warning">Warning: (N-1) × max pitch exceeds outer radius. Reduce turns or pitch.</p>';
+        }
+        for (const pitch_mm of p_mm) {
+          if (pitch_mm < 2 * r0_mm) {
+            warningMsg += '<p class="warning">Warning: Pitch must be ≥ 2×wire radius. Reduce pitch.</p>';
+            break;
+          }
         }
       }
 
@@ -267,10 +268,10 @@
         ${warningMsg}
         <p><strong>Skin Depth δ:</strong> ${delta_um.toFixed(3)} µm</p>
         <p><strong>Coil Length ℓ:</strong> ${l.toFixed(6)} m</p>
-        <p><strong>DC Resistance R<sub>DC</sub>:</strong> ${Rdc.toFixed(3)} Ω</p>
-        <p><strong>Skin Resistance Rₛ,total:</strong> ${Rskin_tot.toFixed(3)} Ω</p>
-        <p><strong>Proximity Resistance Rₚ,total:</strong> ${Rprox_tot.toFixed(3)} Ω</p>
-        <p><strong>Total AC Resistance Rₜₒₜₐₗ:</strong> ${Rtotal.toFixed(3)} Ω</p>
+        <p><strong>DC Resistance R<sub>DC</sub>:</strong> ${Rdc.toFixed(6)} Ω</p>
+        <p><strong>Skin Resistance Rₛ,total:</strong> ${Rskin_tot.toFixed(6)} Ω</p>
+        <p><strong>Proximity Resistance Rₚ,total:</strong> ${Rprox_tot.toFixed(6)} Ω</p>
+        <p><strong>Total AC Resistance Rₜₒₜₐₗ:</strong> ${Rtotal.toFixed(6)} Ω</p>
       `;
     }
 
@@ -281,6 +282,7 @@
       const steps = parseInt(document.getElementById('steps').value);
       const labels = [];
       const data = [];
+      let warningMsg = '';
 
       // Read constant inputs
       const sigma = parseFloat(document.getElementById('sigma').value);
@@ -293,13 +295,38 @@
       const rout = rout_mm * 1e-3; 
       const shape = document.getElementById('shape').value;
 
+      // If spiral, validate original pitch array before frequency sweep
+      if (shape === 'spiral' && (type === 'freq_R' || type === 'freq_Gp')) {
+        const maxPitch_mm = Math.max(...p_mm);
+        const radialSpan = (N - 1) * (maxPitch_mm * 1e-3);
+        if (radialSpan > rout) {
+          warningMsg += '<p class="warning">Warning: (N-1) × max pitch exceeds outer radius. Reduce turns or pitch.</p>';
+        }
+        for (const pitch_mm of p_mm) {
+          if (pitch_mm < 2 * r0_mm) {
+            warningMsg += '<p class="warning">Warning: Pitch must be ≥ 2×wire radius. Reduce pitch.</p>';
+            break;
+          }
+        }
+      }
+
       for (let i = 0; i <= steps; i++) {
         const val = startVal + (endVal - startVal) * (i / steps);
         let yVal;
         let labelVal = val.toFixed(3);
 
         if (type === 'pitch_R' || type === 'pitch_Gp') {
-          // Sweep pitch (mm)
+          // Sweep pitch (mm) for spiral validation
+          if (shape === 'spiral') {
+            const pitch_mm = val;
+            const radialSpan = (N - 1) * (pitch_mm * 1e-3);
+            if (radialSpan > rout) {
+              warningMsg += '<p class="warning">Warning: At pitch=' + pitch_mm.toFixed(3) + ' mm, (N-1)×pitch exceeds outer radius.</p>';
+            }
+            if (pitch_mm < 2 * r0_mm) {
+              warningMsg += '<p class="warning">Warning: At pitch=' + pitch_mm.toFixed(3) + ' mm, pitch < 2×wire radius.</p>';
+            }
+          }
           labels.push(labelVal);
           const p_sweep = Array(N).fill(val * 1e-3);
           const { R, Gp } = computeRGp(p_sweep, sigma, r0, N, rout, shape, null);
@@ -314,7 +341,7 @@
         data.push(yVal);
       }
 
-      // Update existing chart data
+      // Update chart data
       if (window.myChart) {
         window.myChart.data.labels = labels;
         window.myChart.data.datasets[0].data = data;
@@ -325,6 +352,11 @@
         window.myChart.options.scales.y.title.text = (type.includes('R') ? 'Resistance (Ω)' : 'Gp');
         window.myChart.update();
       }
+
+      // Display warnings (if any)
+      const resultDiv = document.getElementById('result');
+      // Preserve any previous calculation results above plot area
+      resultDiv.innerHTML = warningMsg + (resultDiv.innerHTML || '');
     }
 
     function computeRGp(p_array, sigma, r0, N, rout, shape, f_override) {
