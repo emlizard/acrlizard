@@ -1,439 +1,407 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Coil Resistance Calculator</title>
-  <!-- MathJax Loading -->
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-  <!-- Chart.js for plotting -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    body { font-family: Arial, sans-serif; background: #f7f9fa; color: #333; margin: 0; padding: 0; }
-    header { background: #2c3e50; color: white; padding: 1rem; text-align: center; }
-    .container { max-width: 800px; margin: 2rem auto; background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    .field { margin-bottom: 1rem; }
-    label { display: block; margin-bottom: 0.25rem; font-weight: bold; }
-    input, select { width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px; }
-    button { margin-top: 1rem; width: 100%; padding: 0.75rem; background: #1abc9c; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem; }
-    button:hover { background: #159a82; }
-    .result { margin-top: 1.5rem; padding: 1rem; background: #ecf0f1; border-radius: 4px; }
-    .warning { color: #c0392b; font-weight: bold; margin-top: 1rem; }
-    .formulas { margin-top: 2rem; padding: 1rem; background: #fff; border: 1px solid #ccc; border-radius: 4px; }
-    .formulas h2 { margin-top: 0; }
-    img.diagram { display: block; margin: 0 auto 1rem auto; max-width: 100%; height: auto; }
-    .chart-container { margin-top: 2rem; }
-    canvas { width: 100% !important; height: 400px !important; }
-  </style>
+    <meta charset="UTF-8">
+    <title>Coil Resistance & Inductance Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
+        .header { text-align: center; margin-bottom: 20px; }
+        .header img { max-width: 200px; display: block; margin: 10px auto; }
+        #container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 840px; margin: 0 auto;}
+        .card { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .card h3 { margin-top: 0; }
+        label { display: block; margin-top: 10px; font-weight: bold; }
+        input[type="number"], textarea {
+            width: 100%; padding: 8px; margin-top: 10px; border: 1px solid #ccc; border-radius: 4px;
+            font-family: Arial, sans-serif; font-size: 14px; width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; }
+        textarea { resize: vertical; }
+        button { display: block; width: 100%; margin-top: 15px; padding: 10px; background: #007bff; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #0056b3; }
+        #mathjax { margin-top: 40px; max-width: 800px; margin:10px auto; }
+        .radio-group { display: flex; 
+  			 gap: 10px;            /* 버튼 간 간격 */
+  align-items: center;  /* 텍스트 수직 정렬 */
+}
+.radio-group label {
+  margin: 0;            /* 필요하면 추가 간격 조절 */
+  font-weight: normal;
+}
+.radio-group input {
+  margin-right: 5px;
+}
+
+    </style>
 </head>
 <body>
-  <header><h1>Coil Resistance Calculator</h1></header>
-  <div class="container">
-    <!-- Centered Spiral Diagram -->
-    <img src="https://emlizard.github.io/main-page/images/diagram_spiral.jpg" alt="Spiral Diagram" class="diagram" />
-
-    <!-- Input Fields -->
-    <div class="field">
-      <label for="f">Frequency f (MHz)</label>
-      <input type="number" id="f" value="1" />
+    <div class="header">
+        <h2>Coil Resistance & Inductance Calculator</h2>
+        <img src="https://emlizard.github.io/main-page/images/diagram_acr.png" alt="Coil Diagram">
     </div>
-    <div class="field">
-      <label for="sigma">Conductivity σ (S/m)</label>
-      <input type="number" id="sigma" value="5.8e7" />
+    <div id="container">
+        <div class="card">
+            <h3>Inputs</h3>
+	    <label for="f">Frequency f (MHz):</label>
+            <input id="f" type="number" value="1" step="any">
+
+	    <label for="s">Conductivity σ (×10<sup>7</sup> S/m):</label>
+            <input id="s" type="number" value="5.8" step="any">
+
+	    <label for="r0">Wire Radius r<sub>0</sub> (mm):</label>
+            <input id="r0" type="number" value="0.5" step="any">
+
+	    <label for="N">Number of Turns N:</label>
+            <input id="N" type="number" value="6" step="1">
+
+            <label for="OD">Coil Outer Diameter OD (mm):</label>
+            <input id="OD" type="number" value="200" step="any">
+
+
+
+            <label>Pitch Type:</label>
+	    <div class="radio-group">
+            	<label><input type="radio" name="pitchType" value="identical" checked onchange="togglePitch()"> Identical Pitch</label>
+            	<label><input type="radio" name="pitchType" value="unequal" onchange="togglePitch()"> Unequal Pitch</label>
+	    </div>
+	
+            <div id="identicalPitchInput">
+                <label for="p0">Pitch p (mm):</label>
+                <input id="p0" type="number" value="1.2" step="any">
+            </div>
+            <div id="unequalPitchInput" style="display:none;">
+                <label for="pList">Pitches p<sub>i</sub> (mm, comma-separated for N-1 entries):</label>
+                <textarea id="pList">1,1,1</textarea>
+            </div>
+
+            <label>Coil Shape:</label>
+	   <div class="radio-group">
+  	   	<label><input type="radio" name="coilShape" value="spiral" checked> Spiral</label>
+  	   	<label><input type="radio" name="coilShape" value="helical"> Helical</label>
+	   </div>
+
+            
+
+            <button onclick="calculate()">Calculate</button>
+        </div>
+        <div class="card">
+            <h3>Outputs</h3>
+            <p>Wire Length ℓ<sub>total</sub> (mm): <span id="coilLength">-</span></p>
+            <p>DCR (Ω): <span id="DCR">-</span></p>
+            <p>R<sub>skin</sub> (Ω): <span id="Rskin">-</span></p>
+            <p>R<sub>prox</sub> (Ω): <span id="Rprox">-</span></p>
+            <p>R<sub>total</sub> (Ω): <span id="Rtotal">-</span></p>
+            <p>Self-Inductance L (µH): <span id="L">-</span></p>
+            <p>G<sub>p</sub>: <span id="Gp">-</span></p>
+        </div>
     </div>
-    <div class="field">
-      <label for="r0">Wire Radius r₀ (mm)</label>
-      <input type="number" id="r0" value="0.5" />
-    </div>
-    <div class="field">
-      <label for="N">Turns N</label>
-      <input type="number" id="N" value="10" />
-    </div>
-    <div class="field">
-      <label for="p">Pitch Array p (comma-separated, mm)</label>
-      <input type="text" id="p" value="1.2" />
-    </div>
-    <div class="field">
-      <label for="rout">Outer Radius rₒᵤₜ (mm)</label>
-      <input type="number" id="rout" value="20" />
-    </div>
-    <div class="field">
-      <label for="shape">Shape</label>
-      <select id="shape">
-        <option value="spiral">Spiral</option>
-        <option value="helical">Helical</option>
-      </select>
-    </div>
-    <button onclick="calculateResistance()">Calculate Resistance</button>
-
-    <!-- Result Area -->
-    <div id="result" class="result"></div>
-
-    <!-- Plot Controls -->
-    <div class="field">
-      <label for="plotType">Plot Type</label>
-      <select id="plotType">
-        <option value="pitch_R">Resistance (Ω) vs Pitch (mm)</option>
-        <option value="pitch_Gp">Gp vs Pitch (mm)</option>
-        <option value="freq_R">Resistance (Ω) vs Frequency (MHz)</option>
-        <option value="freq_Gp">Gp vs Frequency (MHz)</option>
-      </select>
-    </div>
-    <div class="field" id="sweepRange">
-      <label for="startVal">Start Value</label>
-      <input type="number" id="startVal" value="1" />
-      <label for="endVal">End Value</label>
-      <input type="number" id="endVal" value="10" />
-      <label for="steps">Steps</label>
-      <input type="number" id="steps" value="10" />
-    </div>
-    <button onclick="plotGraph()">Plot Graph</button>
-    <div class="chart-container">
-      <canvas id="myChart"></canvas>
-    </div>
-
-    <!-- Used Formulas (MathJax) -->
-    <div class="formulas">
-      <h2>Formulas Used</h2>
-
-      <h3>Skin Depth (δ)</h3>
-      \[
-      \delta = \frac{1}{\sqrt{\pi f \,\mu_0\, \sigma}}
-      \]
-
-      <h3>Skin Resistance (R<sub>skin</sub>, Ω/m)</h3>
-      \[
-      R_{\mathrm{skin}} = \begin{cases}
-        \displaystyle
-        \frac{\tfrac14 + \frac{r_0}{2\delta} + \frac{3\delta}{32 r_0}}{\pi \; r_0^2 \; \sigma}, & r_0 > \delta, \\[1em]
-        \displaystyle
-        \frac{1 + \bigl(\tfrac{r_0}{\delta}\bigr)^4/48}{\pi \; r_0^2 \; \sigma}, & r_0 \le \delta,
-      \end{cases}
-      \]
-
-      <h3>Coil Length (l)</h3>
-      \[
-      l = \begin{cases}
-        2\pi\,\displaystyle\sum_{k=1}^N \Bigl(r_{\mathrm{out}} - \sum_{i=1}^{k-1} p_i\Bigr), & \text{Spiral}\\[1em]
-        2\pi\,r_{\mathrm{out}}\,N, & \text{Helical}
-      \end{cases}
-      \]
-
-      <h3>DC Resistance (R<sub>DC</sub>)</h3>
-      \[
-      R_{DC} = \frac{l}{\sigma \; \pi \; r_0^2}
-      \]
-
-      <h3>Geometric Constraints</h3>
-      \[
-      (N-1) \times p_{\mathrm{max}} \le r_{\mathrm{out}} \quad \text{(reduce turns or pitch if not met)}
-      \]
-      \[
-      p_i \ge 2 \; r_0 \quad \text{for all i (reduce pitch if not met)}
-      \]
-
-      <h3>Proximity Factor (G<sub>p</sub>)</h3>
-      \[
-      G_p = \begin{cases}
-        \displaystyle
-        \frac{8 \pi^2 \; \delta^2 \; x^3 \; (x-1) \; \sum_{m=1}^N H_m^2}{N \bigl((2x+1)^2+2\bigr)}, & r_0 > \delta, \\[1em]
-        0, & r_0 \le \delta
-      \end{cases},\quad x = \frac{2 \; r_0}{\delta}
-      \]
-
-      <h3>Magnetic Field Terms (H<sub>m</sub>)</h3>
-      \[
-      H_m = \frac{H_{\rm asy}(m) + H_{\rm sym}(m)}{2\pi}
-      \]
-      \[
-      H_{\rm asy}(m) = \sum_{i=1}^N \frac{p_{m+i-1}}{\bigl(p_{m+i-1}\bigr)^2 + r_0^2}, \quad
-      H_{\rm sym}(m) = \sum_{q=1}^N \frac{2 \; r_0}{p_q^2 \; q^2 - r_0^2}
-      \]
-
-      <h3>Total Resistances</h3>
-      \[
-      R_{\mathrm{skin,tot}} = R_{\mathrm{skin}} \times l, \quad
-      R_{\mathrm{prox,tot}} = G_p \times R_{\mathrm{skin}}, \quad
-      R_{\mathrm{total}} = (1+G_p) \; R_{\mathrm{skin}} \times l
-      \]
-    </div>
-  </div>
-
-  <script>
-    // Functions for pitch and H calculation
-    function f_H_asy(r0, p, m, N) {
-      let Hasy = 0;
-      for (let i = 1; i <= N; i++) {
-        const idx = (m - 1) + (i - 1);
-        const pi = p[idx < p.length ? idx : p.length - 1];
-        Hasy += pi / (pi * pi + r0 * r0);
-      }
-      return Hasy;
+    <script>
+    function togglePitch() {
+        const type = document.querySelector('input[name="pitchType"]:checked').value;
+        document.getElementById('identicalPitchInput').style.display = type === 'identical' ? 'block' : 'none';
+        document.getElementById('unequalPitchInput').style.display = type === 'unequal' ? 'block' : 'none';
     }
 
-    function f_H_sym(r0, p, m, N) {
-      let Hsym = 0;
-      for (let q = 1; q <= N; q++) {
-        const pq = p[q - 1] !== undefined ? p[q - 1] : p[p.length - 1];
-        Hsym += (2 * r0) / (pq * pq * q * q - r0 * r0);
-      }
-      return Hsym;
-    }
+    // Use provided Math.agm and Math.EllipticK/E implementations
+/* The arithmetic-geometric mean of two non-negative numbers */
+/*https://github.com/duetosymmetry/elliptic-integrals-js/blob/master/elliptic.js*/
+Math.agm = function(a0,g0) {
+  var maxIter = 50;
+  var an = (a0+g0)/2;
+  var gn = Math.sqrt(a0*g0);
+  var iter;
+  for (iter=0; iter<maxIter && Math.abs(an-gn)>1e-15; iter++) {
+    a0 = 0.5*(an+gn);
+    g0 = Math.sqrt(an*gn);
+    an = a0;
+    gn = g0;
+  }
+  if (iter==maxIter) console.warn("Math.agm hit iteration limit, may not have converged");
+  return an;
+};
 
-    function calculateResistance() {
-      // Read inputs and convert units
-      const fMHz = parseFloat(document.getElementById('f').value);
-      const f = fMHz * 1e6;
-      const sigma = parseFloat(document.getElementById('sigma').value);
-      const r0_mm = parseFloat(document.getElementById('r0').value);
-      const r0 = r0_mm * 1e-3;
-      const N = parseInt(document.getElementById('N').value);
-      const p_mm = document.getElementById('p').value.split(',').map(x => parseFloat(x.trim()));
-      const p = p_mm.map(x => x * 1e-3);
-      const rout_mm = parseFloat(document.getElementById('rout').value);
-      const rout = rout_mm * 1e-3;
-      const shape = document.getElementById('shape').value;
-      const mu0 = 4 * Math.PI * 1e-7;
+/* Complete elliptic integral of the first kind K(m) */
+Math.EllipticK = function(m) {
+  var kprime = Math.sqrt(1-m);
+  return 0.5*Math.PI/Math.agm(1, kprime);
+};
 
-      // Validation (only for spiral)
-      let warningMsg = '';
-      if (shape === 'spiral') {
-        const maxPitch_mm = Math.max(...p_mm);
-        const radialSpan = (N - 1) * (maxPitch_mm * 1e-3);
-        if (radialSpan > rout) {
-          warningMsg += '<p class="warning">Warning: (N-1) × max pitch exceeds outer radius. Reduce turns or pitch.</p>';
+/* Complete elliptic integral of the second kind E(m) */
+Math.EllipticE = function(m) {
+  var maxIter=50, iter=0;
+  var kprime = Math.sqrt(1-m);
+  var a0=1, g0=kprime, an=a0, gn=g0;
+  var twoPow=0.25;
+  var partialSum = 1 - 0.5*m;
+  while(Math.abs(an-gn)>1e-15 && iter<maxIter) {
+    partialSum -= twoPow*(an-gn)*(an-gn);
+    twoPow *= 2;
+    a0 = 0.5*(an+gn);
+    g0 = Math.sqrt(an*gn);
+    an = a0; gn = g0;
+    iter++;
+  }
+  if (iter==maxIter) console.warn("Math.EllipticE hit iteration limit, may not have converged");
+  return 0.5*Math.PI*partialSum/an;
+};
+
+function f_L_self_helical(r0, N, rout, p) {
+        const mu0 = 4 * Math.PI * 1e-7;
+        // build z array length N
+        const z = [0];
+        for (let i = 1; i < N; i++) {
+            z[i] = z[i-1] + p[i-1];
         }
-        for (const pitch_mm of p_mm) {
-          if (pitch_mm < 2 * r0_mm) {
-            warningMsg += '<p class="warning">Warning: Pitch must be ≥ 2×wire radius. Reduce pitch.</p>';
-            break;
-          }
-        }
-      }
-
-      // 1) Skin depth (m and µm)
-      const delta = 1 / Math.sqrt(Math.PI * f * mu0 * sigma);
-      const delta_um = delta * 1e6;
-
-      // 2) Hₘ calculation
-      const Hm = [];
-      for (let m = 1; m <= N; m++) {
-        const Hasy = f_H_asy(r0, p, m, N);
-        const Hsym = f_H_sym(r0, p, m, N);
-        Hm.push((Hasy + Hsym) / (2 * Math.PI));
-      }
-      const sumHm2 = Hm.reduce((s, h) => s + h * h, 0);
-
-      // 3) Proximity factor Gₚ
-      const x = (2 * r0) / delta;
-      let Gp = 0;
-      if (r0 > delta) {
-        Gp = (8 * Math.PI * Math.PI * delta * delta * x * x * x * (x - 1) * sumHm2) /
-             (N * ((2 * x + 1) * (2 * x + 1) + 2));
-      }
-
-      // 4) Skin resistance Rₛ (Ω/m)
-      let Rskin_m;
-      if (r0 > delta) {
-        Rskin_m = (0.25 + r0 / (2 * delta) + (3 * delta) / (32 * r0)) / (Math.PI * r0 * r0 * sigma);
-      } else {
-        Rskin_m = (1 + Math.pow(r0 / delta, 4) / 48) / (Math.PI * r0 * r0 * sigma);
-      }
-
-      // 5) Coil length ℓ (m)
-      let l = 0;
-      if (shape === 'spiral') {
-        let acc = 0;
-        const radii = [];
+        const M = Array.from({length: N}, () => Array(N).fill(0));
         for (let i = 0; i < N; i++) {
-          radii.push(rout - acc);
-          acc += (p[i] !== undefined ? p[i] : p[p.length - 1]);
+            for (let j = 0; j < N; j++) {
+                if (i === j) {
+                    M[i][j] = mu0 * rout * (Math.log(8 * rout / r0) - 1.75);
+                } else {
+                    const dz = z[i] - z[j];
+                    let m = 4 * rout * rout / (4 * rout * rout + dz * dz);
+                    m = Math.min(Math.max(m, 1e-12), 1 - 1e-12);
+                    const K = Math.EllipticK(m);
+                    const E = Math.EllipticE(m);
+                    M[i][j] = mu0 * Math.sqrt(rout * rout / m) * ((2 - m) * K - 2 * E);
+                }
+            }
         }
-        const sumRadii = radii.reduce((sum, r) => sum + r, 0);
-        l = 2 * Math.PI * sumRadii;
-      } else {
-        l = 2 * Math.PI * rout * N;
-      }
-
-      // 6) Resistances
-      const Rskin_tot = Rskin_m * l;
-      const Rprox_tot = Gp * Rskin_m * l;
-      const Rtotal = (1 + Gp) * Rskin_m * l;
-      // DC resistance
-      const Rdc = l / (sigma * Math.PI * r0 * r0);
-
-      // 7) Display results (fixed format)
-      const resultDiv = document.getElementById('result');
-      resultDiv.innerHTML = `
-        ${warningMsg}
-        <p><strong>Skin Depth δ:</strong> ${delta_um.toFixed(3)} µm</p>
-        <p><strong>Coil Length ℓ:</strong> ${l.toFixed(6)} m</p>
-        <p><strong>DC Resistance R<sub>DC</sub>:</strong> ${Rdc.toFixed(6)} Ω</p>
-        <p><strong>Skin Resistance Rₛ,total:</strong> ${Rskin_tot.toFixed(6)} Ω</p>
-        <p><strong>Proximity Factor Gₚ:</strong> ${Gp.toFixed(6)}</p>
-        <p><strong>Proximity Resistance Rₚ,total:</strong> ${Rprox_tot.toFixed(6)} Ω</p>
-        <p><strong>Total AC Resistance Rₜₒₜₐₗ:</strong> ${Rtotal.toFixed(6)} Ω</p>
-      `;
+        let Lsum = 0;
+        for (let ii = 0; ii < N; ii++) {
+            for (let jj = 0; jj < N; jj++) {
+                Lsum += M[ii][jj];
+            }
+        }
+        return Lsum;
     }
 
-    function plotGraph() {
-      const type = document.getElementById('plotType').value;
-      const startVal = parseFloat(document.getElementById('startVal').value);
-      const endVal = parseFloat(document.getElementById('endVal').value);
-      const steps = parseInt(document.getElementById('steps').value);
-      const labels = [];
-      const data = [];
-      let warningMsg = '';
-
-      // Read constant inputs
-      const sigma = parseFloat(document.getElementById('sigma').value);
-      const r0_mm = parseFloat(document.getElementById('r0').value);
-      const r0 = r0_mm * 1e-3;
-      const N = parseInt(document.getElementById('N').value);
-      const p_mm = document.getElementById('p').value.split(',').map(x => parseFloat(x.trim()));
-      const p_orig = p_mm.map(x => x * 1e-3);
-      const rout_mm = parseFloat(document.getElementById('rout').value);
-      const rout = rout_mm * 1e-3; 
-      const shape = document.getElementById('shape').value;
-
-      // If spiral, validate original pitch array before frequency sweep
-      if (shape === 'spiral' && (type === 'freq_R' || type === 'freq_Gp')) {
-        const maxPitch_mm = Math.max(...p_mm);
-        const radialSpan = (N - 1) * (maxPitch_mm * 1e-3);
-        if (radialSpan > rout) {
-          warningMsg += '<p class="warning">Warning: (N-1) × max pitch exceeds outer radius. Reduce turns or pitch.</p>';
+    function f_L_self_spiral(r0, N, rout, p) {
+        const mu0 = 4 * Math.PI * 1e-7;
+        // build r array length N
+        const r = [rout];
+        for (let i = 1; i < N; i++) {
+            r[i] = rout - p.slice(0, i).reduce((s, x) => s + x, 0);
         }
-        for (const pitch_mm of p_mm) {
-          if (pitch_mm < 2 * r0_mm) {
-            warningMsg += '<p class="warning">Warning: Pitch must be ≥ 2×wire radius. Reduce pitch.</p>';
-            break;
-          }
+        const M = Array.from({length: N}, () => Array(N).fill(0));
+        for (let i = 0; i < N; i++) {
+            for (let j = 0; j < N; j++) {
+                if (i === j) {
+                    M[i][j] = mu0 * r[i] * (Math.log(8 * r[i] / r0) - 1.75);
+                } else {
+                    let m = 4 * r[i] * r[j] / ((r[i] + r[j]) * (r[i] + r[j]));
+                    m = Math.min(Math.max(m, 1e-12), 1 - 1e-12);
+                    const K = Math.EllipticK(m);
+                    const E = Math.EllipticE(m);
+                    M[i][j] = mu0 * Math.sqrt(r[i] * r[j] / m) * ((2 - m) * K - 2 * E);
+                }
+            }
         }
-      }
-
-      for (let i = 0; i <= steps; i++) {
-        const val = startVal + (endVal - startVal) * (i / steps);
-        let yVal;
-        let labelVal = val.toFixed(3);
-
-        if (type === 'pitch_R' || type === 'pitch_Gp') {
-          // Sweep pitch (mm) for spiral validation
-          if (shape === 'spiral') {
-            const pitch_mm = val;
-            const radialSpan = (N - 1) * (pitch_mm * 1e-3);
-            if (radialSpan > rout) {
-              warningMsg += '<p class="warning">Warning: At pitch=' + pitch_mm.toFixed(3) + ' mm, (N-1)×pitch exceeds outer radius.</p>';
+        let Lsum = 0;
+        for (let ii = 0; ii < N; ii++) {
+            for (let jj = 0; jj < N; jj++) {
+                Lsum += M[ii][jj];
             }
-            if (pitch_mm < 2 * r0_mm) {
-              warningMsg += '<p class="warning">Warning: At pitch=' + pitch_mm.toFixed(3) + ' mm, pitch < 2×wire radius.</p>';
-            }
-          }
-          labels.push(labelVal);
-          const p_sweep = Array(N).fill(val * 1e-3);
-          const { R, Gp } = computeRGp(p_sweep, sigma, r0, N, rout, shape, null);
-          yVal = (type === 'pitch_R') ? R : Gp;
+        }
+        return Lsum;
+    }
+
+ // Symmetric magnetic field component
+    function f_H_sym(R, p, m, N) {
+        const xx = N % 2;
+        const NN = xx === 0 ? N/2 : (N+1)/2;
+        if (m === 1 || m === N) return 0;
+        let pp_left = [], pp_right = [];
+        if (m <= NN) {
+            for (let k = m-1, sumL=0; k >= 1; k--) { sumL += p[k-1]; pp_left.push(sumL); }
+            for (let k = m, sumR=0; k < m + pp_left.length; k++) { sumR += p[k-1]; pp_right.push(sumR); }
         } else {
-          // Sweep frequency (MHz)
-          labels.push(labelVal);
-          const f_sweep = val * 1e6;
-          const { R, Gp } = computeRGp(p_orig, sigma, r0, N, rout, shape, f_sweep);
-          yVal = (type === 'freq_R') ? R : Gp;
+            const lower = 2*m - N;
+            for (let k = m-1, sumL=0; k >= lower; k--) { sumL += p[k-1]; pp_left.push(sumL); }
+            for (let k = m, sumR=0; k < m + pp_left.length; k++) { sumR += p[k-1]; pp_right.push(sumR); }
         }
-        data.push(yVal);
-      }
-
-      // Update chart data
-      if (window.myChart) {
-        window.myChart.data.labels = labels;
-        window.myChart.data.datasets[0].data = data;
-        window.myChart.data.datasets[0].label = 
-          (type.includes('pitch') ? 'Pitch (mm)' : 'Frequency (MHz)') + ' vs ' +
-          (type.includes('R') ? 'Resistance (Ω)' : 'Gp');
-        window.myChart.options.scales.x.title.text = (type.includes('pitch') ? 'Pitch (mm)' : 'Frequency (MHz)');
-        window.myChart.options.scales.y.title.text = (type.includes('R') ? 'Resistance (Ω)' : 'Gp');
-        window.myChart.update();
-      }
-
-      // Display warnings (if any)
-      const resultDiv = document.getElementById('result');
-      // Preserve any previous calculation results above plot area
-      resultDiv.innerHTML = warningMsg + (resultDiv.innerHTML || '');
+        return pp_left.reduce((Hsum, _, i) => {
+            const x1 = pp_left[i]/R, x2 = pp_right[i]/R;
+            const term = Math.sqrt((1 + x1*x1)/Math.pow(x1*x1 - 1, 2)
+                + (1 + x2*x2)/Math.pow(x2*x2 - 1, 2)
+                - 2*(x1*x2 - 1)/((x1*x1 - 1)*(x2*x2 - 1)))
+                / (2 * Math.PI * R);
+            return Hsum + term;
+        }, 0);
     }
 
-    function computeRGp(p_array, sigma, r0, N, rout, shape, f_override) {
-      const mu0 = 4 * Math.PI * 1e-7;
-      const f = (f_override !== null) ? f_override : (parseFloat(document.getElementById('f').value) * 1e6);
-
-      // Skin depth
-      const delta = 1 / Math.sqrt(Math.PI * f * mu0 * sigma);
-
-      // Hₘ
-      const Hm = [];
-      for (let m = 1; m <= N; m++) {
-        const Hasy = f_H_asy(r0, p_array, m, N);
-        const Hsym = f_H_sym(r0, p_array, m, N);
-        Hm.push((Hasy + Hsym) / (2 * Math.PI));
-      }
-      const sumHm2 = Hm.reduce((s, h) => s + h * h, 0);
-
-      // Proximity factor Gₚ
-      const x = (2 * r0) / delta;
-      let Gp = 0;
-      if (r0 > delta) {
-        Gp = (8 * Math.PI * Math.PI * delta * delta * x * x * x * (x - 1) * sumHm2) /
-             (N * ((2 * x + 1) * (2 * x + 1) + 2));
-      }
-
-      // Skin resistance
-      let Rskin_m;
-      if (r0 > delta) {
-        Rskin_m = (0.25 + r0 / (2 * delta) + (3 * delta) / (32 * r0)) / (Math.PI * r0 * r0 * sigma);
-      } else {
-        Rskin_m = (1 + Math.pow(r0 / delta, 4) / 48) / (Math.PI * r0 * r0 * sigma);
-      }
-
-      // Coil length
-      let l = 0;
-      if (shape === 'spiral') {
-        let acc = 0;
-        const radii = [];
-        for (let i = 0; i < N; i++) {
-          radii.push(rout - acc);
-          acc += (p_array[i] !== undefined ? p_array[i] : p_array[p_array.length - 1]);
+    // Asymmetric magnetic field component
+    function f_H_asy(R, p, m, N) {
+        const xx = N % 2;
+        const NN = xx === 0 ? N/2 : (N+1)/2;
+        if (m === NN && xx === 1) return 0;
+        let Hsum = 0;
+        if (m <= NN) {
+            let offset = 0;
+            for (let k = m; k < m + (m-1); k++) offset += p[k-1];
+            let pp_right = [];
+            for (let k = 2*m - 1, sumR=0; k <= N-1; k++) { sumR += p[k-1]; pp_right.push(sumR + offset); }
+            Hsum = pp_right.reduce((sum,val)=> sum + val/(val*val + R*R)/(2*Math.PI), 0);
+        } else if (m < N) {
+            let offset = 0;
+            for (let k = m-1; k >= 2*m - N; k--) offset += p[k-1];
+            let pp_left = [];
+            for (let k = 2*m - N - 1, sumL=0; k >= 1; k--) { sumL += p[k-1]; pp_left.push(sumL + offset); }
+            Hsum = pp_left.reduce((sum,val)=> sum + val/(val*val + R*R)/(2*Math.PI), 0);
+        } else {
+            let sumL=0, pp_left=[];
+            for (let k = 2*m - N - 1; k >= 1; k--) { sumL += p[k-1]; pp_left.push(sumL); }
+            Hsum = pp_left.reduce((sum,val)=> sum + val/(val*val + R*R)/(2*Math.PI), 0);
         }
-        const sumRadii = radii.reduce((sum, r) => sum + r, 0);
-        l = 2 * Math.PI * sumRadii;
-      } else {
-        l = 2 * Math.PI * rout * N;
-      }
-
-      const Rtot = (1 + Gp) * Rskin_m * l;
-      return { R: Rtot, Gp: Gp };
+        return Hsum;
     }
 
-    // Initialize an empty chart on load with dummy data
-    window.onload = function() {
-      const ctx = document.getElementById('myChart').getContext('2d');
-      window.myChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: [''],                 // single dummy label
-          datasets: [{
-            label: '',                  // no label initially
-            data: [0],                  // single zero value
-            borderColor: '#1abc9c',
-            backgroundColor: 'rgba(26, 188, 156, 0.2)',
-            fill: true
-          }]
-        },
-        options: {
-          scales: {
-            x: { display: true, title: { display: true, text: '' } },
-            y: { display: true, title: { display: true, text: '' } }
-          }
+
+
+    function calculate() {
+        const OD_mm = parseFloat(document.getElementById('OD').value);
+        const wire_r_mm = parseFloat(document.getElementById('r0').value);
+        const coil_r_max_mm = OD_mm/2;
+        const shape = document.querySelector('input[name="coilShape"]:checked').value;
+        const f = parseFloat(document.getElementById('f').value) * 1e6;
+        const N = parseInt(document.getElementById('N').value);
+        const sigma = parseFloat(document.getElementById('s').value) * 1e7;
+
+        let p_mm = [];
+        const type = document.querySelector('input[name="pitchType"]:checked').value;
+        if (type === 'identical') {
+            const p0 = parseFloat(document.getElementById('p0').value);
+            p_mm = Array(N-1).fill(p0);
+        } else {
+            p_mm = document.getElementById('pList').value.split(',').map(v=>parseFloat(v));
         }
-      });
-    };
-  </script>
+
+        let coilLength_mm;
+        if (shape === 'spiral') {
+            const radii = [coil_r_max_mm];
+            for (let i = 1; i < N; i++) radii.push(radii[i-1] - p_mm[i-1]);
+            coilLength_mm = radii.reduce((sum, r) => sum + 2*Math.PI*r, 0);
+        } else {
+            coilLength_mm = Math.PI * OD_mm * N; // helical length = π·OD·N
+        }
+
+        const coilLength_m = coilLength_mm/1000;
+        const area = Math.PI * Math.pow(wire_r_mm/1000, 2);
+        const DCR = coilLength_m / (area * sigma);
+
+        const r0 = wire_r_mm/1000;
+        const p_list_m = p_mm.map(v=>v/1000);
+        const Hm = [];
+        for (let m=1; m<=N; m++) {
+            Hm.push(f_H_asy(r0, p_list_m, m, N) + f_H_sym(r0, p_list_m, m, N));
+        }
+        const mu0 = 4 * Math.PI * 1e-7;
+        const sd = 1 / Math.sqrt(Math.PI * f * mu0 * sigma);
+        const x = 2 * r0 / sd;
+        const sumH2 = Hm.reduce((s,h)=>s+h*h,0);
+        const Gp = (r0 - sd > 0)
+            ? (8 * sumH2 * Math.PI**2 * sd**2 * x**3 * (x-1) / (((2*x+1)**2 + 2))) / N
+            : (Math.PI**2 * r0**2 * sumH2 * (x/2)**4 / (1 + (x/2)**4/48)) / N;
+        const Rskin = (r0 - sd > 0)
+            ? (0.25 + r0/(2*sd) + 3*sd/(32*r0)) / (Math.PI * r0**2 * sigma)*coilLength_m
+            : (1 + Math.pow(r0/sd,4)/48) / (Math.PI * r0**2 * sigma)*coilLength_m;
+        const Rprox = Gp * Rskin;
+        const Rtotal = (1 + Gp) * Rskin;
+
+        document.getElementById('coilLength').textContent = coilLength_mm.toFixed(3);
+        document.getElementById('DCR').textContent = DCR.toFixed(6);
+        document.getElementById('Rskin').textContent = Rskin.toFixed(6);
+        document.getElementById('Rprox').textContent = Rprox.toFixed(6);
+        document.getElementById('Rtotal').textContent = Rtotal.toFixed(6);
+        document.getElementById('Gp').textContent = Gp.toFixed(6);
+
+
+        // Inductance
+        const r0_m = wire_r_mm/1000;
+        const rout_m = coil_r_max_mm/1000;
+        const p_m = p_mm.map(v=>v/1000);
+        let L_self = (shape === 'helical')
+            ? f_L_self_helical(r0_m, N, rout_m, p_m)
+            : f_L_self_spiral(r0_m, N, rout_m, p_m);
+        const L_uH = L_self * 1e6;
+
+        document.getElementById('L').textContent = L_uH.toFixed(3);
+        // Other outputs updated similarly...
+    }
+    </script>
+
+    <div id="mathjax" class="card">
+        <h3>Formulas Used</h3>
+<div id="mathjax" class="card">
+  <h3>Formulas Used</h3>
+
+  <!-- Resistance Formulas -->
+  <p><strong>DC Resistance</strong></p>
+  $$\ell = \begin{cases}
+    2\pi R_{\mathrm{coil}}\,N, & \text{spiral} \\
+    \pi\,OD\,N, & \text{helical}
+  \end{cases}$$
+  $$R_{\mathrm{DC}} = \frac{\ell}{\pi\,r_{0}^{2}\,\sigma}$$
+
+  <p><strong>Skin Effect Resistance</strong></p>
+  $$
+  \delta = \frac{1}{\sqrt{\pi f \mu_{0}\,\sigma}},\quad
+  x = \frac{2r_{0}}{\delta},\quad
+  a = r_{0}-\delta
+  $$
+  $$
+  R_{\mathrm{skin}} =
+  \begin{cases}
+    \displaystyle
+    \frac{\tfrac14 + \tfrac{r_{0}}{2\delta} + \tfrac{3\delta}{32r_{0}}}
+         {\pi\,r_{0}^{2}\,\sigma}, & a>0 \\
+    \displaystyle
+    \frac{1 + \tfrac{(r_{0}/\delta)^{4}}{48}}
+         {\pi\,r_{0}^{2}\,\sigma},      & a\le0
+  \end{cases}
+  $$
+
+  <p><strong>Proximity Effect</strong></p>
+  $$
+  G_{p} =
+  \begin{cases}
+    \displaystyle
+    \frac{8\pi^{2}\delta^{2}\,x^{3}(x-1)\sum H_{m}^{2}}
+         {((2x+1)^{2}+2)\,N}, & a>0 \\[1ex]
+    \displaystyle
+    \frac{\pi^{2}r_{0}^{2}\,(x/2)^{4}\sum H_{m}^{2}}
+         {\bigl(1+(x/2)^{4}/48\bigr)\,N}, & a\le0
+  \end{cases}
+  $$
+  $$
+  R_{\mathrm{total}} = (1 + G_{p})\,R_{\mathrm{skin}}
+  $$
+
+  <hr>
+
+  <!-- Inductance Formulas -->
+  <p><strong>Self-Inductance</strong></p>
+  
+<p style="font-size:12px; color:#666; margin-top:10px;">
+        The elliptic integral code is based on the implementation by duetosymmetry (Leo C. Stein).
+    </p>
+$$
+  L_{\mathrm{self}} = \sum_{i=1}^{N}\sum_{j=1}^{N} M_{ij},\quad
+  M_{ii} = \mu_{0}r_{i}\Bigl(\ln\frac{8r_{i}}{r_{0}} - 1.75\Bigr),\quad
+  M_{ij} = \mu_{0}\sqrt{\frac{r_{i}r_{j}}{m}}\Bigl((2-m)K(m) - 2E(m)\Bigr)
+  $$
+  $$
+  m = 
+  \begin{cases}
+    \dfrac{4r^{2}}{4r^{2} + (z_{i}-z_{j})^{2}}, & \text{helical} \\[1ex]
+    \dfrac{4r_{i}r_{j}}{(r_{i}+r_{j})^{2}}, & \text{spiral}
+  \end{cases}
+  $$
+
+        $$L_{{helical}} = \sum_{i,j} M_{ij},\quad L_{{spiral}} = \sum_{i,j} M_{ij},$$
+        $$M_{ii} = \mu_0 r_i \bigl(\ln\frac{8r_i}{r_0}-1.75\bigr),$$
+        $$M_{ij} = \mu_0\sqrt{\frac{r_ir_j}{m}}\bigl((2-m)K(m)-2E(m)\bigr),$$
+        $$m=\begin{cases}\frac{4r^2}{4r^2+(z_i-z_j)^2},&\text{helical}\\\frac{4r_ir_j}{(r_i+r_j)^2},&\text{spiral}\end{cases}$$
+    </div>
 </body>
 </html>
