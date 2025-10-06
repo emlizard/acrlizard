@@ -1,94 +1,130 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en" data-theme="light">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coil Resistance & Inductance Calculator</title>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Additional style to make MathJax responsive to theme changes */
+        .mjx-chtml {
+            color: var(--text-primary);
+        }
+    </style>
 </head>
-<body data-theme="light">
+<body>
 
     <header class="header">
         <div class="header-content">
-            <h1 class="page-title">⚡ Coil Calculator</h1>
-            <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme"></button>
+            <h1 class="page-title">Coil Calculator</h1>
+            <button class="theme-toggle" id="theme-toggle-btn" aria-label="Toggle theme">
+                </button>
         </div>
     </header>
 
     <main class="container">
-        <div class="card animate-in" style="text-align: center;">
-            <img src="https://emlizard.github.io/main-page/images/diagram_acr2.png" alt="Coil Diagram" style="max-width: 100%; height: auto; border-radius: var(--radius);">
-        </div>
+        <section class="hero animate-in">
+            <h1>Coil Resistance & Inductance Calculator</h1>
+            <p>An advanced tool to calculate the AC resistance and self-inductance of spiral and helical coils, accounting for skin and proximity effects.</p>
+        </section>
 
         <div class="grid grid-2">
-            <!-- Inputs Card -->
-            <div class="card animate-in">
-                <h2 class="card-title"><span class="card-icon">⚙️</span>Inputs</h2>
-                <div class="grid grid-3" style="gap: 1rem;">
-                    <div class="input-group"><label for="f" class="input-label">Frequency (MHz)</label><input id="f" type="number" value="1" step="any" class="input-field"></div>
-                    <div class="input-group"><label for="s" class="input-label">Conductivity σ (x10⁷ S/m)</label><input id="s" type="number" value="5.8" step="any" class="input-field"></div>
-                    <div class="input-group"><label for="r0" class="input-label">Wire Radius r₀ (mm)</label><input id="r0" type="number" value="0.5" step="any" class="input-field"></div>
-                    <div class="input-group"><label for="N" class="input-label">Turns (N)</label><input id="N" type="number" value="6" step="1" class="input-field"></div>
-                    <div class="input-group"><label for="OD" class="input-label">Outer Diameter (mm)</label><input id="OD" type="number" value="200" step="any" class="input-field"></div>
+            <div class="card animate-in" id="input-card">
+                <h2 class="card-title">
+                    <span class="card-icon">⚙️</span>
+                    Input Parameters
+                </h2>
+                <div class="core-image">
+                    <img src="https://emlizard.github.io/main-page/images/diagram_acr2.png" alt="Coil Diagram">
                 </div>
 
-                <div class="input-group" style="margin-top: 1rem;">
-                    <label class="input-label">Pitch Type</label>
-                    <div class="radio-group">
-                        <label><input type="radio" name="pitchType" value="identical" checked> Identical</label>
-                        <label><input type="radio" name="pitchType" value="unequal"> Unequal</label>
+                <div class="parameter-grid">
+                    <div class="input-group">
+                        <label for="f" class="input-label">Frequency <span class="input-unit">(MHz)</span></label>
+                        <input id="f" type="number" value="1" step="any" class="input-field">
+                    </div>
+                    <div class="input-group">
+                        <label for="s" class="input-label">Conductivity <span class="input-unit">(×10⁷ S/m)</span></label>
+                        <input id="s" type="number" value="5.8" step="any" class="input-field">
                     </div>
                 </div>
-                <div id="identicalPitchInput" class="input-group">
-                    <label for="p0" class="input-label">Pitch p (mm)</label>
-                    <input id="p0" type="number" value="1.2" step="any" class="input-field">
+
+                <div class="dimension-grid">
+                    <div class="input-group">
+                        <label for="r0" class="input-label">Wire Radius <span class="input-unit">(mm)</span></label>
+                        <input id="r0" type="number" value="0.5" step="any" class="input-field">
+                    </div>
+                    <div class="input-group">
+                        <label for="N" class="input-label">Turns <span class="input-unit">(N)</span></label>
+                        <input id="N" type="number" value="6" step="1" class="input-field">
+                    </div>
+                    <div class="input-group">
+                        <label for="OD" class="input-label">Outer Diameter <span class="input-unit">(mm)</span></label>
+                        <input id="OD" type="number" value="200" step="any" class="input-field">
+                    </div>
                 </div>
-                <div id="unequalPitchInput" class="input-group" style="display:none;">
-                    <label for="pList" class="input-label">Pitches pᵢ (mm, comma-separated)</label>
-                    <textarea id="pList" class="input-field" style="resize: vertical;">1,1,1</textarea>
-                </div>
-                 <div class="input-group">
+
+                <div class="input-group">
                     <label class="input-label">Coil Shape</label>
                     <div class="radio-group">
                         <label><input type="radio" name="coilShape" value="spiral" checked> Spiral</label>
                         <label><input type="radio" name="coilShape" value="helical"> Helical</label>
                     </div>
                 </div>
-                <button id="calculateBtn" class="btn btn-full" style="margin-top: 1rem;">Calculate</button>
+
+                <div class="input-group">
+                    <label class="input-label">Pitch Type</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="pitchType" value="identical" checked onchange="togglePitch()"> Identical</label>
+                        <label><input type="radio" name="pitchType" value="unequal" onchange="togglePitch()"> Unequal</label>
+                    </div>
+                </div>
+
+                <div id="identicalPitchInput" class="input-group">
+                    <label for="p0" class="input-label">Pitch <span class="input-unit">(mm)</span></label>
+                    <input id="p0" type="number" value="1.2" step="any" class="input-field">
+                </div>
+                <div id="unequalPitchInput" class="input-group" style="display:none;">
+                    <label for="pList" class="input-label">Pitches pᵢ <span class="input-unit">(mm, comma-separated)</span></label>
+                    <textarea id="pList" class="input-field">1,1,1,1,1</textarea>
+                </div>
+
+                <button class="btn btn-full" onclick="calculate()">
+                    ⚡ Calculate
+                </button>
             </div>
 
-            <!-- Outputs Card -->
-            <div class="card animate-in">
-                <h2 class="card-title"><span class="card-icon">📊</span>Outputs</h2>
-                <div class="result-grid">
-                    <div class="result-item"><span class="result-label">Wire Length ℓ (mm)</span><span class="result-value" id="coilLength">-</span></div>
-                    <div class="result-item"><span class="result-label">DC Resistance (Ω)</span><span class="result-value" id="DCR">-</span></div>
-                    <div class="result-item"><span class="result-label">Skin Effect R (Ω)</span><span class="result-value" id="Rskin">-</span></div>
-                    <div class="result-item"><span class="result-label">Proximity Effect R (Ω)</span><span class="result-value" id="Rprox">-</span></div>
-                    <div class="result-item"><span class="result-label">Total AC Resistance (Ω)</span><span class="result-value" id="Rtotal">-</span></div>
-                    <div class="result-item"><span class="result-label">Self-Inductance L (µH)</span><span class="result-value" id="L">-</span></div>
-                    <div class="result-item"><span class="result-label">Proximity Factor Gₚ</span><span class="result-value" id="Gp">-</span></div>
-                </div>
+            <div class="card animate-in" id="output-card">
+                <h2 class="card-title">
+                    <span class="card-icon">📊</span>
+                    Calculation Results
+                </h2>
+                <div class="result-display" id="result-container">
+                    <div class="placeholder-state">
+                        <p>Results will appear here once you click calculate.</p>
+                    </div>
+                    </div>
             </div>
         </div>
-        
-        <!-- Formula Card -->
-        <div class="card animate-in">
-            <h2 class="card-title"><span class="card-icon">📐</span>Formulas Used</h2>
-            <div class="formula-math">
-                <p><strong>DC Resistance:</strong> $$R_{\mathrm{DC}} = \frac{\ell}{\pi\,r_{0}^{2}\,\sigma}$$</p>
-                <p><strong>AC Resistance:</strong> $$R_{\mathrm{total}} = (1 + G_{p})\,R_{\mathrm{skin}}$$, where \(G_p\) is the proximity factor.</p>
-                <p><strong>Self-Inductance:</strong> $$L_{\mathrm{self}} = \sum_{i=1}^{N}\sum_{j=1}^{N} M_{ij}$$</p>
-                <p>where \(M_{ij}\) is the mutual inductance between turns i and j, calculated using elliptic integrals K(m) and E(m).</p>
-                 <p style="font-size:12px; color:var(--text-secondary); margin-top:10px;">The elliptic integral code is based on the implementation by duetosymmetry (Leo C. Stein).</p>
+
+        <section class="formula-section card animate-in">
+            <h3 class="card-title">Formulas Used</h3>
+            <div class="formula-content">
+                <p><strong>DC Resistance ($R_{DC}$)</strong></p>
+                $$R_{DC} = \frac{\ell_{\text{total}}}{\sigma \pi r_{0}^{2}}$$
+                <p><strong>AC Resistance ($R_{AC}$), including Skin & Proximity Effects</strong></p>
+                $$R_{AC} = R_{\text{skin}} (1 + G_p)$$
+                Where $\delta = (\pi f \mu_0 \sigma)^{-1/2}$ is the skin depth and $G_p$ is the proximity factor derived from magnetic field components.
+                <p><strong>Self-Inductance (L)</strong></p>
+                The inductance is calculated by summing the self-inductance of each turn ($M_{ii}$) and the mutual inductance between all pairs of turns ($M_{ij}$), using complete elliptic integrals $K(m)$ and $E(m)$.
+                $$ L = \sum_{i=1}^{N}\sum_{j=1}^{N} M_{ij} $$
+                $$ M_{ii} = \mu_{0}r_{i}\left(\ln\frac{8r_{i}}{r_{0}} - 1.75\right) $$
+                $$ M_{ij} = \mu_{0}\sqrt{\frac{r_{i}r_{j}}{m}}\left((2-m)K(m) - 2E(m)\right) $$
             </div>
-        </div>
+        </section>
     </main>
+
     <script src="script.js"></script>
 </body>
 </html>
-
