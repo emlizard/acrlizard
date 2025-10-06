@@ -52,3 +52,14 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
 .animate-in { animation: fadeInUp 0.5s ease-out; }
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+/* style.css 파일에서 이 부분을 찾아서 수정하세요. */
+
+.core-image img {
+  max-width: 100%;
+  max-height: 180px;   /* ✅ 이 줄을 추가: 이미지의 최대 높이를 180px로 제한 */
+  width: auto;         /* ✅ 이 줄을 추가: 높이에 맞춰 너비를 자동으로 조절 */
+  height: auto;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  object-fit: contain; /* 이미지 비율을 유지하며 컨테이너에 맞춤 */
+}
