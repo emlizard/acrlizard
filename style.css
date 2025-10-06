@@ -564,3 +564,24 @@
       font-style: italic;
       padding: 2rem;
     }
+/* style.css 파일의 .result-item 관련 부분 아래에 추가하세요. */
+
+.result-grid {
+    display: grid;
+    gap: 1rem;
+    /* 중요: 2개의 컬럼을 명시적으로 정의 */
+    grid-template-columns: 1fr 1fr;
+}
+
+.result-item--highlight {
+    /* 그리드의 1번 라인에서 끝(-1) 라인까지 전체 너비를 차지하도록 설정 */
+    grid-column: 1 / -1;
+    background: var(--surface);
+    border-left: 4px solid var(--primary);
+    transform: scale(1.02); /* 살짝 크게 보여 강조 */
+}
+
+.result-item--highlight .result-value {
+    font-size: 1.25rem; /* 강조된 항목의 값 폰트를 더 크게 */
+    color: var(--primary);
+}
