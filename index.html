@@ -2,15 +2,25 @@
 <html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coil Resistance & Inductance Calculator</title>
-    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+    
     <link rel="stylesheet" href="style.css">
     <style>
-        /* 테마 변경 시 MathJax 폰트 색상이 바뀌도록 추가 */
-        .mjx-chtml {
-            color: var(--text-primary);
-        }
+        .mjx-chtml { color: var(--text-primary); }
     </style>
 </head>
 <body>
