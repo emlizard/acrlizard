@@ -3,29 +3,24 @@ Math.agm=function(a,g){var c,d=1,e=Math.sqrt,f=50;for(c=0;c<f&&1e-15<Math.abs(a-
 
 // --- UI 및 애플리케이션 로직 ---
 document.addEventListener('DOMContentLoaded', () => {
-
     const themeToggleBtn = document.getElementById('theme-toggle-btn');
     const sunIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
     const moonIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
 
-    // 테마 설정 함수
     const applyTheme = (theme) => {
         document.documentElement.setAttribute('data-theme', theme);
         themeToggleBtn.innerHTML = theme === 'light' ? moonIcon : sunIcon;
         localStorage.setItem('theme', theme);
     };
 
-    // 테마 변경 버튼 이벤트 리스너
     themeToggleBtn.addEventListener('click', () => {
         const newTheme = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
         applyTheme(newTheme);
     });
     
-    // 로컬 저장소 또는 시스템 설정에 따라 초기 테마 설정
     const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
     applyTheme(savedTheme);
 
-    // 페이지 로드 시 초기 계산 실행
     calculate();
 });
 
@@ -35,7 +30,6 @@ function togglePitch() {
     document.getElementById('unequalPitchInput').style.display = type === 'unequal' ? 'block' : 'none';
 }
 
-// 임시 에러 메시지 표시 함수
 function showError(message) {
     const errorDiv = document.createElement('div');
     errorDiv.className = 'error-message';
@@ -44,16 +38,12 @@ function showError(message) {
     setTimeout(() => errorDiv.remove(), 4000);
 }
 
-// 메인 계산 함수
 async function calculate() {
     const outputCard = document.getElementById('output-card');
     outputCard.classList.add('calculating');
-
-    // 로딩 스피너가 UI에 표시될 시간을 벌어줌
     await new Promise(resolve => setTimeout(resolve, 50));
     
     try {
-        // --- 1. 입력 값 가져오기 및 유효성 검사 ---
         const f = parseFloat(document.getElementById('f').value) * 1e6;
         const sigma = parseFloat(document.getElementById('s').value) * 1e7;
         const r0_mm = parseFloat(document.getElementById('r0').value);
@@ -80,7 +70,6 @@ async function calculate() {
             }
         }
         
-        // --- 2. 계산 수행 ---
         const r0_m = r0_mm / 1000;
         const rout_mm = OD_mm / 2;
         const rout_m = rout_mm / 1000;
@@ -126,61 +115,37 @@ async function calculate() {
             : f_L_self_spiral(r0_m, N, rout_m, p_m);
         const L_uH = L_self * 1e6;
 
-        // --- 3. 결과 표시 ---
-        // script.js 파일의 calculate 함수 내 '3. 결과 표시' 부분을 아래 코드로 교체하세요.
-
-// --- 3. 결과 표시 ---
-const results = {
-    "Self-Inductance L (µH)": L_uH.toFixed(3),
-    "Total AC Resistance R_total (Ω)": Rtotal.toFixed(5),
-    "Wire Length ℓ (mm)": coilLength_mm.toFixed(2),
-    "DC Resistance DCR (Ω)": DCR.toFixed(5),
-    "Skin Effect Resistance R_skin (Ω)": Rskin.toFixed(5),
-    "Proximity Effect Resistance R_prox (Ω)": Rprox.toFixed(5),
-    "Proximity Factor Gp": Gp.toFixed(5)
-};
-
-const container = document.getElementById('result-container');
-container.innerHTML = `<div class="result-grid"></div>`; // 이전 결과 초기화
-const grid = container.querySelector('.result-grid');
-
-// ✅ 하이라이트할 키워드 목록
-const highlightKeys = ["Self-Inductance", "Total AC Resistance"];
-
-Object.entries(results).forEach(([label, value]) => {
-    const item = document.createElement('div');
-    
-    // ✅ 기본 클래스 설정
-    item.className = 'result-item';
-
-    // ✅ 하이라이트할 키워드가 포함된 경우, 강조 클래스 추가
-    if (highlightKeys.some(key => label.includes(key))) {
-        item.classList.add('result-item--highlight');
-    }
-
-    item.innerHTML = `
-        <div class="result-label">${label}</div>
-        <div class="result-value">${value}</div>
-    `;
-    grid.appendChild(item);
-    
-    // 업데이트 애니메이션 적용
-    setTimeout(() => item.querySelector('.result-value').classList.add('updated'), 50);
-});
+        // --- 3. 결과 표시 (중복 제거 및 하이라이트 기능 적용) ---
+        const results = {
+            "Self-Inductance L (µH)": L_uH.toFixed(3),
+            "Total AC Resistance R_total (Ω)": Rtotal.toFixed(5),
+            "Wire Length ℓ (mm)": coilLength_mm.toFixed(2),
+            "DC Resistance DCR (Ω)": DCR.toFixed(5),
+            "Skin Effect Resistance R_skin (Ω)": Rskin.toFixed(5),
+            "Proximity Effect Resistance R_prox (Ω)": Rprox.toFixed(5),
+            "Proximity Factor Gp": Gp.toFixed(5)
+        };
 
         const container = document.getElementById('result-container');
-        container.innerHTML = `<div class="result-grid"></div>`; // 이전 결과 초기화
+        container.innerHTML = `<div class="result-grid"></div>`;
         const grid = container.querySelector('.result-grid');
         
+        const highlightKeys = ["Self-Inductance", "Total AC Resistance"];
+
         Object.entries(results).forEach(([label, value]) => {
             const item = document.createElement('div');
             item.className = 'result-item';
+
+            if (highlightKeys.some(key => label.includes(key))) {
+                item.classList.add('result-item--highlight');
+            }
+
             item.innerHTML = `
                 <div class="result-label">${label}</div>
                 <div class="result-value">${value}</div>
             `;
             grid.appendChild(item);
-            // 업데이트 애니메이션 적용
+            
             setTimeout(() => item.querySelector('.result-value').classList.add('updated'), 50);
         });
         
