@@ -127,15 +127,46 @@ async function calculate() {
         const L_uH = L_self * 1e6;
 
         // --- 3. 결과 표시 ---
-        const results = {
-            "Self-Inductance L (µH)": L_uH.toFixed(3),
-            "Total AC Resistance R_total (Ω)": Rtotal.toFixed(5),
-            "Wire Length ℓ (mm)": coilLength_mm.toFixed(2),
-            "DC Resistance DCR (Ω)": DCR.toFixed(5),
-            "Skin Effect Resistance R_skin (Ω)": Rskin.toFixed(5),
-            "Proximity Effect Resistance R_prox (Ω)": Rprox.toFixed(5),
-            "Proximity Factor Gp": Gp.toFixed(5)
-        };
+        // script.js 파일의 calculate 함수 내 '3. 결과 표시' 부분을 아래 코드로 교체하세요.
+
+// --- 3. 결과 표시 ---
+const results = {
+    "Self-Inductance L (µH)": L_uH.toFixed(3),
+    "Total AC Resistance R_total (Ω)": Rtotal.toFixed(5),
+    "Wire Length ℓ (mm)": coilLength_mm.toFixed(2),
+    "DC Resistance DCR (Ω)": DCR.toFixed(5),
+    "Skin Effect Resistance R_skin (Ω)": Rskin.toFixed(5),
+    "Proximity Effect Resistance R_prox (Ω)": Rprox.toFixed(5),
+    "Proximity Factor Gp": Gp.toFixed(5)
+};
+
+const container = document.getElementById('result-container');
+container.innerHTML = `<div class="result-grid"></div>`; // 이전 결과 초기화
+const grid = container.querySelector('.result-grid');
+
+// ✅ 하이라이트할 키워드 목록
+const highlightKeys = ["Self-Inductance", "Total AC Resistance"];
+
+Object.entries(results).forEach(([label, value]) => {
+    const item = document.createElement('div');
+    
+    // ✅ 기본 클래스 설정
+    item.className = 'result-item';
+
+    // ✅ 하이라이트할 키워드가 포함된 경우, 강조 클래스 추가
+    if (highlightKeys.some(key => label.includes(key))) {
+        item.classList.add('result-item--highlight');
+    }
+
+    item.innerHTML = `
+        <div class="result-label">${label}</div>
+        <div class="result-value">${value}</div>
+    `;
+    grid.appendChild(item);
+    
+    // 업데이트 애니메이션 적용
+    setTimeout(() => item.querySelector('.result-value').classList.add('updated'), 50);
+});
 
         const container = document.getElementById('result-container');
         container.innerHTML = `<div class="result-grid"></div>`; // 이전 결과 초기화
