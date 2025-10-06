@@ -115,7 +115,7 @@ async function calculate() {
             : f_L_self_spiral(r0_m, N, rout_m, p_m);
         const L_uH = L_self * 1e6;
 
-        // --- 3. 결과 표시 (중복 제거 및 하이라이트 기능 적용) ---
+        // --- 3. 결과 표시 (중복 제거 및 하이라이트 기능 적용된 최종 버전) ---
         const results = {
             "Self-Inductance L (µH)": L_uH.toFixed(3),
             "Total AC Resistance R_total (Ω)": Rtotal.toFixed(5),
