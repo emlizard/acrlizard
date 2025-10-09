@@ -370,7 +370,7 @@ body::before {
 }
 
 .result-value {
-    font-size: 1rem;
+    font-size: 2rem;
     font-weight: 600;
     color: var(--text-primary);
     font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
