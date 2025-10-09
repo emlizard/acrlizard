@@ -24,19 +24,26 @@
     </style>
 </head>
 <body>
+<header class="header">
+    <div class="header-content">
+      <div class="logo-section">
+        <a href="https://emlizard.github.io/main-page/" class="back-btn">
+          <i class="fas fa-arrow-left"></i>
+          Back to Calculators
+        </a>
+        <div class="page-title">Coil Calculator</div>
+      </div>
+      <button class="theme-toggle" onclick="toggleTheme()">
+        <i class="fas fa-moon" id="themeIcon"></i>
+      </button>
+    </div>
+  </header>
 
-    <header class="header">
-        <div class="header-content">
-            <h1 class="page-title">Coil Calculator</h1>
-            <button class="theme-toggle" id="theme-toggle-btn" aria-label="Toggle theme">
-                </button>
-        </div>
-    </header>
 
     <main class="container">
         <section class="hero animate-in">
             <h1>Coil Resistance & Inductance Calculator</h1>
-            <p>표피 효과와 근접 효과를 고려하여 나선형 및 헬리컬 코일의 AC 저항과 자체 인덕턴스를 계산하는 고급 도구입니다.</p>
+            <p>This is an advanced tool that calculates the AC resistance and self-inductance of spiral and helical coils while considering the skin and proximity effects.</p>
         </section>
 
         <div class="grid grid-2">
@@ -112,7 +119,7 @@
                 </h2>
                 <div class="result-display" id="result-container">
                     <div class="placeholder-state">
-                        <p>결과는 계산 버튼을 누르면 여기에 표시됩니다.</p>
+                        <p>Results will be displayed here once you press the 'Calculate' button.</p>
                     </div>
                     </div>
             </div>
